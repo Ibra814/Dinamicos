@@ -10,20 +10,9 @@ from colorama import Fore, init
 
 init()
 
-path = 'chromedriver_win32'
-# Configurar las opciones del navegador
-# chrome_options = Options()
-# chrome_options.add_argument("--headless")  # Ejecutar en modo headless
-
-# Inicializar el driver de Selenium
-# driver = webdriver.Chrome(options=chrome_options)
-# Inicializar el driver de Selenium
-# driver = webdriver.Chrome(options=chrome_options)
-
+path = 'chromedriver-win64'
 service = Service(executable_path=path)
 driver = webdriver.Chrome(service=service)
-
-
 web = 'https://dynamicoos.my.site.com/prestadores/s/login/?ec=302&startURL=%2Fprestadores%2Fs%2F'
 driver.get(web)
 
@@ -45,11 +34,68 @@ boton_login.click()
 
 time.sleep(10)
 
+#------------------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------------------
 
-#------------------------------------------------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------------------------------------------------
-def dinamicos (NumeroDocumento, Fecha, CodigoCups, diagnostico_v):
+# # Ruta del archivo de texto
+# ruta_archivo = 'CITOLOGIA.txt'
+
+# # Nombres de las columnas
+# columnas = ['Factura', 'Codigo', 'TipoDocumento', 'NoDocumento', 'Fecha', 'Col6', 'Cups', 'Col8', 'Col9', 'Col10', 'Diagnostico', 'Col12', 'Col13', 'Col14', 'Col15']
+
+# # Leer el archivo de texto y convertirlo en un DataFrame
+# df = pd.read_csv(ruta_archivo, delimiter=',', names=columnas, usecols=[2, 3, 4, 6, 10])
+
+# numero_documento_lista = df['NoDocumento']
+# fecha_proceso_lista = df['Fecha']
+# codigo_cups_lista = df['Cups']
+# diagnostico_lista = df['Diagnostico']
+
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# # Ruta del archivo de texto
+# ruta_archivo = 'ESPECIALISTAS.txt'
+
+# # Nombres de las columnas
+# columnas = ['Factura', 'Codigo', 'TipoDocumento', 'NoDocumento', 'Fecha', 'Col6', 'Cups', 'Col8', 'Col9', 'Diagnostico', 'Col11', 'Col12', 'Col13', 'Col14', 'Col15', 'Col16', 'Col17' ]
+
+# # Leer el archivo de texto y convertirlo en un DataFrame
+# df = pd.read_csv(ruta_archivo, delimiter=',', names=columnas, usecols=[2, 3, 4, 6, 9])
+
+# numero_documento_lista = df['NoDocumento']
+# fecha_proceso_lista = df['Fecha']
+# codigo_cups_lista = df['Cups']
+# diagnostico_lista = df['Diagnostico']
+
+# cantidad = len(numero_documento_lista)
+# cantidad = str(cantidad)
+
+# ---------------------------------------------------------------------------
+
+# Ruta del archivo de texto
+ruta_archivo = 'POTENCIALES.txt'
+
+# Nombres de las columnas
+columnas = ['Factura', 'Codigo', 'TipoDocumento', 'NoDocumento', 'Fecha', 'Col6', 'Cups', 'Col8', 'Col9',  'Col10', 'Diagnostico', 'Col12', 'Col13', 'Col14', 'Col15']
+
+# Leer el archivo de texto y convertirlo en un DataFrame
+df = pd.read_csv(ruta_archivo, delimiter=',', names=columnas, usecols=[2, 3, 4, 6, 10])
+
+numero_documento_lista = df['NoDocumento']
+fecha_proceso_lista = df['Fecha']
+codigo_cups_lista = df['Cups']
+diagnostico_lista = df['Diagnostico']
+
+cantidad = len(numero_documento_lista)
+cantidad = str(cantidad)
+
+contador = 0
+numeros_agendas = []
+
+for NumeroDocumento, Fecha, CodigoCups, diagnostico_v in zip(numero_documento_lista, fecha_proceso_lista, codigo_cups_lista, diagnostico_lista):
     try:
+        contador += 1
+        print(Fore.CYAN + "\n[!] Paciente Numero: " + str(contador), end='\r')
         # Empezar a subir los datos a la pagina
         documento = str(NumeroDocumento)
         #Buscando la etiqueta para ingresar el numero de cedula
@@ -193,6 +239,9 @@ def dinamicos (NumeroDocumento, Fecha, CodigoCups, diagnostico_v):
                 agenda = driver.find_element("xpath", "//span[@class='slds-pill__label sl-pill__label']")
                 numero_agenda = agenda.text
 
+                #agregar numero de agenda a la lista
+                numeros_agendas.append(numero_agenda)
+
                 #borrar el contenido que hay en buscar
                 searc_input.clear()
                 time.sleep(1)
@@ -209,9 +258,9 @@ def dinamicos (NumeroDocumento, Fecha, CodigoCups, diagnostico_v):
                 #Dar click en el boton asistida
                 direccionar = driver.find_element("xpath", "//button[@class='slds-button slds-button_success']")
                 direccionar.click()
-                print(Fore.GREEN + "Cargado exitosamente el paciente: " + int(NumeroDocumento))
+                print(Fore.GREEN + "Cargado exitosamente el paciente: " + documento, end='\r')
                 time.sleep(8)
-                print(Fore.GREEN + "\r" + "Cargado exitosamente el paciente: " + documento, end='')
+
                 
 
             #Proceso para primera vez medicina interna
@@ -306,6 +355,9 @@ def dinamicos (NumeroDocumento, Fecha, CodigoCups, diagnostico_v):
                 agenda = driver.find_element("xpath", "//span[@class='slds-pill__label sl-pill__label']")
                 numero_agenda = agenda.text
 
+                #agregar numero de agenda a la lista
+                numeros_agendas.append(numero_agenda)
+
                 #borrar el contenido que hay en buscar
                 searc_input.clear()
                 time.sleep(1)
@@ -322,13 +374,12 @@ def dinamicos (NumeroDocumento, Fecha, CodigoCups, diagnostico_v):
                 #Dar click en el boton asistida
                 direccionar = driver.find_element("xpath", "//button[@class='slds-button slds-button_success']")
                 direccionar.click()
-                print(Fore.GREEN + "\r" + "Cargado exitosamente el paciente: " + documento, end='')
+                print(Fore.GREEN + "Cargado exitosamente el paciente: " + documento, end='\r')
                 time.sleep(8)
-                
 
             #Proceso para control medicina general
             elif codigo_cups == '890366':
-                        #Llenar solicitud
+                #Llenar solicitud
                 ips = driver.find_element("xpath", "//input[@placeholder='Selecciona una ips']")
                 ips.send_keys("CONFIMED")
                 time.sleep(3)
@@ -417,6 +468,9 @@ def dinamicos (NumeroDocumento, Fecha, CodigoCups, diagnostico_v):
                 agenda = driver.find_element("xpath", "//span[@class='slds-pill__label sl-pill__label']")
                 numero_agenda = agenda.text
 
+                #agregar numero de agenda a la lista
+                numeros_agendas.append(numero_agenda)
+
                 #borrar el contenido que hay en buscar
                 searc_input.clear()
                 time.sleep(1)
@@ -433,9 +487,8 @@ def dinamicos (NumeroDocumento, Fecha, CodigoCups, diagnostico_v):
                 #Dar click en el boton asistida
                 direccionar = driver.find_element("xpath", "//button[@class='slds-button slds-button_success']")
                 direccionar.click()
-                print(Fore.GREEN + "\r" + "Cargado exitosamente el paciente: " + documento, end='')
+                print(Fore.GREEN + "Cargado exitosamente el paciente: " + documento, end='\r')
                 time.sleep(8)
-                
 
             #Proceso para primera vez ginecologia
             elif codigo_cups == '890250':
@@ -452,7 +505,6 @@ def dinamicos (NumeroDocumento, Fecha, CodigoCups, diagnostico_v):
                     sede.click()
                     time.sleep(3)
                     
-
                 #seleccionar diagnostico
                 dx = driver.find_element("xpath", "//input[@placeholder='Buscar Diagnósticos de cuidados sanitarios...']")
                 dx.send_keys(f'{diagnostico_v}')
@@ -528,6 +580,9 @@ def dinamicos (NumeroDocumento, Fecha, CodigoCups, diagnostico_v):
                 agenda = driver.find_element("xpath", "//span[@class='slds-pill__label sl-pill__label']")
                 numero_agenda = agenda.text
 
+                #agregar numero de agenda a la lista
+                numeros_agendas.append(numero_agenda)
+
                 #borrar el contenido que hay en buscar
                 searc_input.clear()
                 time.sleep(1)
@@ -544,7 +599,7 @@ def dinamicos (NumeroDocumento, Fecha, CodigoCups, diagnostico_v):
                 #Dar click en el boton asistida
                 direccionar = driver.find_element("xpath", "//button[@class='slds-button slds-button_success']")
                 direccionar.click()
-                print(Fore.GREEN + "\r" + "Cargado exitosamente el paciente: " + documento, end='')
+                print(Fore.GREEN + "Cargado exitosamente el paciente: " + documento, end='\r')
                 time.sleep(8)
 
             #Proceso para control ginecologia
@@ -637,6 +692,9 @@ def dinamicos (NumeroDocumento, Fecha, CodigoCups, diagnostico_v):
                 agenda = driver.find_element("xpath", "//span[@class='slds-pill__label sl-pill__label']")
                 numero_agenda = agenda.text
 
+                #agregar numero de agenda a la lista
+                numeros_agendas.append(numero_agenda)
+
                 #borrar el contenido que hay en buscar
                 searc_input.clear()
                 time.sleep(1)
@@ -653,7 +711,7 @@ def dinamicos (NumeroDocumento, Fecha, CodigoCups, diagnostico_v):
                 #Dar click en el boton asistida
                 direccionar = driver.find_element("xpath", "//button[@class='slds-button slds-button_success']")
                 direccionar.click()
-                print(Fore.GREEN + "\r" + "Cargado exitosamente el paciente: " + documento, end='')
+                print(Fore.GREEN + "Cargado exitosamente el paciente: " + documento, end='\r')
                 time.sleep(8)
 
             #Proceso para primera vez nutricion
@@ -746,6 +804,9 @@ def dinamicos (NumeroDocumento, Fecha, CodigoCups, diagnostico_v):
                 agenda = driver.find_element("xpath", "//span[@class='slds-pill__label sl-pill__label']")
                 numero_agenda = agenda.text
 
+                #agregar numero de agenda a la lista
+                numeros_agendas.append(numero_agenda)
+
                 #borrar el contenido que hay en buscar
                 searc_input.clear()
                 time.sleep(1)
@@ -762,7 +823,7 @@ def dinamicos (NumeroDocumento, Fecha, CodigoCups, diagnostico_v):
                 #Dar click en el boton asistida
                 direccionar = driver.find_element("xpath", "//button[@class='slds-button slds-button_success']")
                 direccionar.click()
-                print(Fore.GREEN + "\r" + "Cargado exitosamente el paciente: " + documento, end='')
+                print(Fore.GREEN + "Cargado exitosamente el paciente: " + documento, end='\r')
                 time.sleep(8)
 
             #Proceso para control nutricion
@@ -855,6 +916,9 @@ def dinamicos (NumeroDocumento, Fecha, CodigoCups, diagnostico_v):
                 agenda = driver.find_element("xpath", "//span[@class='slds-pill__label sl-pill__label']")
                 numero_agenda = agenda.text
 
+                #agregar numero de agenda a la lista
+                numeros_agendas.append(numero_agenda)
+
                 #borrar el contenido que hay en buscar
                 searc_input.clear()
                 time.sleep(1)
@@ -871,7 +935,7 @@ def dinamicos (NumeroDocumento, Fecha, CodigoCups, diagnostico_v):
                 #Dar click en el boton asistida
                 direccionar = driver.find_element("xpath", "//button[@class='slds-button slds-button_success']")
                 direccionar.click()
-                print(Fore.GREEN + "\r" + "Cargado exitosamente el paciente: " + documento, end='')
+                print(Fore.GREEN + "Cargado exitosamente el paciente: " + documento, end='\r')
                 time.sleep(8)
             #Proceso para primera vez pediatria
             elif codigo_cups == '890283':
@@ -963,6 +1027,9 @@ def dinamicos (NumeroDocumento, Fecha, CodigoCups, diagnostico_v):
                 agenda = driver.find_element("xpath", "//span[@class='slds-pill__label sl-pill__label']")
                 numero_agenda = agenda.text
 
+                #agregar numero de agenda a la lista
+                numeros_agendas.append(numero_agenda)
+
                 #borrar el contenido que hay en buscar
                 searc_input.clear()
                 time.sleep(1)
@@ -979,7 +1046,7 @@ def dinamicos (NumeroDocumento, Fecha, CodigoCups, diagnostico_v):
                 #Dar click en el boton asistida
                 direccionar = driver.find_element("xpath", "//button[@class='slds-button slds-button_success']")
                 direccionar.click()
-                print(Fore.GREEN + "\r" + "Cargado exitosamente el paciente: " + documento, end='')
+                print(Fore.GREEN + "Cargado exitosamente el paciente: " + documento, end='\r')
                 time.sleep(8)
             #Proceso para control pediatria
             elif codigo_cups == '890383':
@@ -1071,6 +1138,9 @@ def dinamicos (NumeroDocumento, Fecha, CodigoCups, diagnostico_v):
                 agenda = driver.find_element("xpath", "//span[@class='slds-pill__label sl-pill__label']")
                 numero_agenda = agenda.text
 
+                #agregar numero de agenda a la lista
+                numeros_agendas.append(numero_agenda)
+
                 #borrar el contenido que hay en buscar
                 searc_input.clear()
                 time.sleep(1)
@@ -1087,7 +1157,7 @@ def dinamicos (NumeroDocumento, Fecha, CodigoCups, diagnostico_v):
                 #Dar click en el boton asistida
                 direccionar = driver.find_element("xpath", "//button[@class='slds-button slds-button_success']")
                 direccionar.click()
-                print(Fore.GREEN + "\r" + "Cargado exitosamente el paciente: " + documento, end='')
+                print(Fore.GREEN + "Cargado exitosamente el paciente: " + documento, end='\r')
                 time.sleep(8)
 
             elif codigo_cups == '954629':
@@ -1169,72 +1239,21 @@ def dinamicos (NumeroDocumento, Fecha, CodigoCups, diagnostico_v):
                 validar = driver.find_element("xpath", "//button[@title='Validar']")
                 validar.click()
                 time.sleep(5)
-                print(Fore.GREEN + "\r" + "Cargado exitosamente el paciente: " + documento, end='')
+                print(Fore.GREEN + "Cargado exitosamente el paciente: " + documento, end='\r')
             
         else:
-            print(Fore.YELLOW + f'[!] El paciente esta {afiliacion}')
+            print(Fore.YELLOW + f'[!] El paciente {documento} esta {afiliacion}')
     except:
-        print(Fore.RED + f'[-] El paciente {NumeroDocumento} no fue agregado \n')
-
-#------------------------------------------------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------------------------------------------------
+        print(Fore.RED + f'\n[-] El paciente {NumeroDocumento} no fue agregado \n')
 
 
-# # Ruta del archivo de texto
-# ruta_archivo = 'CITOLOGIA.txt'
 
-# # Nombres de las columnas
-# columnas = ['Factura', 'Codigo', 'TipoDocumento', 'NoDocumento', 'Fecha', 'Col6', 'Cups', 'Col8', 'Col9', 'Col10', 'Diagnostico', 'Col12', 'Col13', 'Col14', 'Col15']
+# Cierra el navegador
+driver.quit()
 
-# # Leer el archivo de texto y convertirlo en un DataFrame
-# df = pd.read_csv(ruta_archivo, delimiter=',', names=columnas, usecols=[2, 3, 4, 6, 10])
+df['Agendas'] = numeros_agendas
 
-# numero_documento = df['NoDocumento']
-# fecha_proceso = df['Fecha']
-# codigo_cups = df['Cups']
-# diagnostico = df['Diagnostico']
-
-#-------------------------------------------------------------------------------------------------------------------------------
-
-# # Ruta del archivo de texto
-# ruta_archivo = 'ESPECIALISTAS.txt'
-
-# # Nombres de las columnas
-# columnas = ['Factura', 'Codigo', 'TipoDocumento', 'NoDocumento', 'Fecha', 'Col6', 'Cups', 'Col8', 'Col9', 'Diagnostico', 'Col11', 'Col12', 'Col13', 'Col14', 'Col15', 'Col16', 'Col17' ]
-
-# # Leer el archivo de texto y convertirlo en un DataFrame
-# df = pd.read_csv(ruta_archivo, delimiter=',', names=columnas, usecols=[2, 3, 4, 6, 9])
-
-# numero_documento = df['NoDocumento']
-# fecha_proceso = df['Fecha']
-# codigo_cups = df['Cups']
-# diagnostico = df['Diagnostico']
-
-# cantidad = len(numero_documento)
-# cantidad = str(cantidad)
-
-#---------------------------------------------------------------------------
-
-# Ruta del archivo de texto
-ruta_archivo = 'ESPECIALISTAS.txt'
-
-# Nombres de las columnas
-columnas = ['Factura', 'Codigo', 'TipoDocumento', 'NoDocumento', 'Fecha', 'Col6', 'Cups', 'Col8', 'Col9',  'Col10', 'Diagnostico', 'Col12', 'Col13', 'Col14', 'Col15']
-
-# Leer el archivo de texto y convertirlo en un DataFrame
-df = pd.read_csv(ruta_archivo, delimiter=',', names=columnas, usecols=[2, 3, 4, 6, 10])
-
-numero_documento = df['NoDocumento']
-fecha_proceso = df['Fecha']
-codigo_cups = df['Cups']
-diagnostico = df['Diagnostico']
-
-cantidad = len(numero_documento)
-cantidad = str(cantidad)
-
-print(Fore.YELLOW + "Cantidad de pacientes: " + cantidad + "\n")
-for a,b,c,d in zip(numero_documento, fecha_proceso, codigo_cups, diagnostico):
-    dinamicos(a,b,c,d)
+df.to_excel('agendas.xlsx', index=False)
 
 
 
