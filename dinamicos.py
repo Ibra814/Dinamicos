@@ -1,21 +1,18 @@
 import pandas as pd
 import os
 from selenium.webdriver.common.keys import Keys
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
+# from selenium import webdriver
+# from selenium.webdriver.chrome.options import Options
+# from selenium import webdriver
+# from selenium.webdriver.chrome.service import Service
+from seleniumbase import Driver
 import time
 from colorama import Fore, init
 
 init()
 
-path = 'chromedriver-win64'
-service = Service(executable_path=path)
-driver = webdriver.Chrome(service=service)
-web = 'https://dynamicoos.my.site.com/prestadores/s/login/?ec=302&startURL=%2Fprestadores%2Fs%2F'
-driver.get(web)
-
+driver = Driver(uc=True)
+driver.get('https://dynamicoos.my.site.com/prestadores/s/login/?ec=302&startURL=%2Fprestadores%2Fs%2F')
 time.sleep(5)
 
 # Encontrar los campos de usuario y contraseña
@@ -1239,7 +1236,15 @@ for NumeroDocumento, Fecha, CodigoCups, diagnostico_v in zip(numero_documento_li
                 validar = driver.find_element("xpath", "//button[@title='Validar']")
                 validar.click()
                 time.sleep(5)
-                print(Fore.GREEN + "Cargado exitosamente el paciente: " + documento, end='\r')
+                print(Fore.GREEN + '\r' + "Cargado exitosamente el paciente: " + documento, end='')
+                time.sleep(5)
+
+                #Copiar el numero de agenda
+                agenda = driver.find_element("xpath", "//span[@class='slds-pill__label sl-pill__label']")
+                numero_agenda = agenda.text
+
+                #agregar numero de agenda a la lista
+                numeros_agendas.append(numero_agenda)
             
         else:
             print(Fore.YELLOW + f'[!] El paciente {documento} esta {afiliacion}')
